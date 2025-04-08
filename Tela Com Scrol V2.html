@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboards com Scroll</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+
+    #dashboardContainer {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .scroll-frame {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: none;
+      transition: transform 60s linear;
+    }
+
+    .multi-frame {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .multi-frame iframe {
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="dashboardContainer"></div>
+
+<script>
+  const dashboardGroups = [
+    ["https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=538&var-sprint=404&var-department_id=148&from=1744029348606&to=1744050948606&viewPanel=46", "https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=538&var-sprint=404&var-department_id=148&from=1744029380865&to=1744050980865&viewPanel=72"],
+    ["https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=384&var-sprint=406&var-department_id=21&from=1744029410226&to=1744051010226&viewPanel=46", "https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=384&var-sprint=406&var-department_id=21&from=1744029426499&to=1744051026499&viewPanel=72"],
+    ["https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=524&var-sprint=408&var-department_id=29&from=1744029449659&to=1744051049659&viewPanel=46", "https://cloudhml.zionlogtec.com.br:3000/grafana/d/f86717b7-cc21-4f6c-88aa-42e3e99f5785/sprint-geral?orgId=1&refresh=1m&var-workgroup=524&var-sprint=408&var-department_id=29&from=1744029463660&to=1744051063660&viewPanel=72"], 
+["https://app.powerbi.com/view?r=eyJrIjoiMjQ2NDBlMjktNjE4MS00NDZmLTlkODgtMzc0YmVmMmQ1OTlkIiwidCI6IjIzYWNjOGMzLWFkOGUtNDcxOS1iM2JkLWMyZmY1Mzc4YmU3OSJ9"]
+  ];
+
+  let currentGroup = 0;
+  const container = document.getElementById("dashboardContainer");
+
+  function loadCurrentGroup() {
+    container.innerHTML = "";
+    const group = dashboardGroups[currentGroup];
+
+    // Tela com apenas 1 dashboard (ativa efeito scroll)
+    if (group.length === 1) {
+      const iframe = document.createElement("iframe");
+      iframe.src = group[0];
+      iframe.className = "scroll-frame";
+      container.appendChild(iframe);
+
+      // Aplica animação de subida e descida
+      setTimeout(() => {
+        iframe.style.transform = "translateY(-30%)";
+      }, 1000);
+
+      // Volta ao topo após tempo
+      setTimeout(() => {
+        iframe.style.transform = "translateY(0)";
+      }, 20000);
+    }
+
+    // Telas com 2+ dashboards
+    else {
+      const frameContainer = document.createElement("div");
+      frameContainer.className = "multi-frame";
+
+      group.forEach(link => {
+        const iframe = document.createElement("iframe");
+        iframe.src = link;
+        iframe.style.width = `${100 / group.length}%`;
+        frameContainer.appendChild(iframe);
+      });
+
+      container.appendChild(frameContainer);
+    }
+
+    currentGroup = (currentGroup + 1) % dashboardGroups.length;
+  }
+
+  loadCurrentGroup();
+  setInterval(loadCurrentGroup, 10000);
+</script>
+
+</body>
+</html>
